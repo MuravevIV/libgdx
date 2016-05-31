@@ -14,11 +14,10 @@ import com.ilyamur.libgdx.MarioBros;
 public class Hud {
 
     private Stage stage;
-    private Viewport viewport;
 
-    private Integer worldTimer;
-    private float timeCount;
-    private Integer score;
+    private Integer worldTimer = 300;
+    private float timeCount = 0;
+    private Integer score = 0;
 
     private Label countDownLabel;
     private Label scoreLabel;
@@ -26,26 +25,24 @@ public class Hud {
     private Label levelLabel;
     private Label worldLabel;
     private Label marioLabel;
-    private Label.LabelStyle labelStyle;
 
-    public Hud(SpriteBatch sb) {
-        worldTimer = 300;
-        timeCount = 0;
-        score = 0;
-        viewport = new FitViewport(MarioBros.V_WIDTH, MarioBros.V_HEIGHT, new OrthographicCamera());
-        stage = new Stage(viewport, sb);
+    public Hud(SpriteBatch spriteBatch) {
+        FitViewport viewport = new FitViewport(MarioBros.V_WIDTH, MarioBros.V_HEIGHT, new OrthographicCamera());
+        createStage(viewport, spriteBatch);
+    }
 
+    private void createStage(Viewport viewport, SpriteBatch spriteBatch) {
+        stage = new Stage(viewport, spriteBatch);
+        stage.addActor(createTable());
+    }
+
+    private Table createTable() {
         Table table = new Table();
         table.top();
         table.setFillParent(true);
 
-        labelStyle = new Label.LabelStyle(new BitmapFont(), Color.WHITE);
-        countDownLabel = createLabel(String.format("%03d", worldTimer));
-        scoreLabel = createLabel(String.format("%06d", score));
-        timeLabel = createLabel("TIME");
-        levelLabel = createLabel("1-1");
-        worldLabel = createLabel("WORLD");
-        marioLabel = createLabel("MARIO");
+        Label.LabelStyle labelStyle = new Label.LabelStyle(new BitmapFont(), Color.WHITE);
+        createLabels(labelStyle);
 
         table.add(marioLabel).expandX().padTop(10);
         table.add(worldLabel).expandX().padTop(10);
@@ -55,10 +52,19 @@ public class Hud {
         table.add(levelLabel).expandX();
         table.add(countDownLabel).expandX();
 
-        stage.addActor(table);
+        return table;
     }
 
-    private Label createLabel(String format) {
+    private void createLabels(Label.LabelStyle labelStyle) {
+        countDownLabel = createLabel(String.format("%03d", worldTimer), labelStyle);
+        scoreLabel = createLabel(String.format("%06d", score), labelStyle);
+        timeLabel = createLabel("TIME", labelStyle);
+        levelLabel = createLabel("1-1", labelStyle);
+        worldLabel = createLabel("WORLD", labelStyle);
+        marioLabel = createLabel("MARIO", labelStyle);
+    }
+
+    private Label createLabel(String format, Label.LabelStyle labelStyle) {
         return new Label(format, labelStyle);
     }
 
