@@ -11,7 +11,7 @@ import com.ilyamur.libgdx.MarioBrosGame;
 public class Mario extends Sprite {
 
     private World world;
-    private Body body;
+    public Body body;
 
     public Mario(World world) {
         this.world = world;

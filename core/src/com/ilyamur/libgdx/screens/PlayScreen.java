@@ -1,6 +1,7 @@
 package com.ilyamur.libgdx.screens;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -39,6 +40,7 @@ public class PlayScreen extends ScreenAdapter {
 
     private final World world;
     private final Box2DDebugRenderer b2dr;
+    private final Mario mario;
 
     public PlayScreen(MarioBrosGame marioBrosGame) {
         this.marioBrosGame = marioBrosGame;
@@ -51,7 +53,7 @@ public class PlayScreen extends ScreenAdapter {
         TiledMap map = loadMap("level1.tmx");
         mapRenderer = new OrthogonalTiledMapRenderer(map, ppm(1));
 
-        world = new World(new Vector2(0, 0), true);
+        world = new World(new Vector2(0, -10), true);
         b2dr = new Box2DDebugRenderer();
 
         addStaticBodies(map, GROUND_LAYER);
@@ -59,7 +61,7 @@ public class PlayScreen extends ScreenAdapter {
         addStaticBodies(map, BRICKS_LAYER);
         addStaticBodies(map, COINS_LAYER);
 
-        new Mario(this.world);
+        mario = new Mario(this.world);
     }
 
     private void addStaticBodies(TiledMap map, int groundLayer) {
@@ -96,11 +98,29 @@ public class PlayScreen extends ScreenAdapter {
     }
 
     public void update(float delta) {
+        handleInput(delta);
 
-        world.step(1/60f, 6, 2);
+        world.step(1 / 60f, 6, 2);
+
+        camera.position.x = mario.body.getPosition().x;
 
         camera.update();
         mapRenderer.setView(camera);
+    }
+
+    private void handleInput(float delta) {
+        if (Gdx.input.isKeyJustPressed(Input.Keys.UP)) {
+            mario.body.applyLinearImpulse(new Vector2(0, 4f), mario.body.getWorldCenter(), true);
+        }
+        float xVelocity = mario.body.getLinearVelocity().x;
+        handleXMovement(Input.Keys.RIGHT, xVelocity <= 2, 0.1f);
+        handleXMovement(Input.Keys.LEFT, xVelocity >= -2, -0.1f);
+    }
+
+    private void handleXMovement(int button, boolean limit, float xVelocityInc) {
+        if (Gdx.input.isKeyPressed(button) && limit) {
+            mario.body.applyLinearImpulse(new Vector2(xVelocityInc, 0), mario.body.getWorldCenter(), true);
+        }
     }
 
     @Override
