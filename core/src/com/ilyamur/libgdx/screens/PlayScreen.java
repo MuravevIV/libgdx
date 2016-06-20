@@ -22,6 +22,7 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.ilyamur.libgdx.MarioBrosGame;
 import com.ilyamur.libgdx.scenes.Hud;
+import com.ilyamur.libgdx.sprites.Mario;
 
 public class PlayScreen extends ScreenAdapter {
 
@@ -57,6 +58,8 @@ public class PlayScreen extends ScreenAdapter {
         addStaticBodies(map, PIPES_LAYER);
         addStaticBodies(map, BRICKS_LAYER);
         addStaticBodies(map, COINS_LAYER);
+
+        new Mario(this.world);
     }
 
     private void addStaticBodies(TiledMap map, int groundLayer) {
@@ -70,11 +73,11 @@ public class PlayScreen extends ScreenAdapter {
 
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.StaticBody;
-        bodyDef.position.set(rect.getX() + rect.getWidth() / 2, rect.getY() + rect.getHeight() / 2);
+        bodyDef.position.set(ppm(rect.getX() + rect.getWidth() / 2), ppm(rect.getY() + rect.getHeight() / 2));
         Body body = world.createBody(bodyDef);
 
         PolygonShape polygonShape = new PolygonShape();
-        polygonShape.setAsBox(rect.getWidth() / 2, rect.getHeight() / 2);
+        polygonShape.setAsBox(ppm(rect.getWidth() / 2), ppm(rect.getHeight() / 2));
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = polygonShape;
         body.createFixture(fixtureDef);
@@ -93,6 +96,9 @@ public class PlayScreen extends ScreenAdapter {
     }
 
     public void update(float delta) {
+
+        world.step(1/60f, 6, 2);
+
         camera.update();
         mapRenderer.setView(camera);
     }
