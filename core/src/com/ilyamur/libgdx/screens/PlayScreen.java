@@ -39,7 +39,7 @@ public class PlayScreen extends ScreenAdapter {
     private final MapRenderer mapRenderer;
 
     private final World world;
-    private final Box2DDebugRenderer b2dr;
+    private final Box2DDebugRenderer debugRenderer;
     private final Mario mario;
 
     public PlayScreen(MarioBrosGame marioBrosGame) {
@@ -54,7 +54,7 @@ public class PlayScreen extends ScreenAdapter {
         mapRenderer = new OrthogonalTiledMapRenderer(map, ppm(1));
 
         world = new World(new Vector2(0, -10), true);
-        b2dr = new Box2DDebugRenderer();
+        debugRenderer = new Box2DDebugRenderer();
 
         addStaticBodies(map, GROUND_LAYER);
         addStaticBodies(map, PIPES_LAYER);
@@ -132,7 +132,7 @@ public class PlayScreen extends ScreenAdapter {
 
         mapRenderer.render();
 
-        b2dr.render(world, camera.combined);
+        debugRenderer.render(world, camera.combined);
 
         marioBrosGame.getBatch().setProjectionMatrix(hud.getStage().getCamera().combined);
         hud.getStage().draw();
