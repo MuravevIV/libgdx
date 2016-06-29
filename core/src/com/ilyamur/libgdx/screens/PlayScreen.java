@@ -7,7 +7,6 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.maps.MapRenderer;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
@@ -27,11 +26,12 @@ public class PlayScreen extends ScreenAdapter {
     private final OrthographicCamera camera;
     private final Viewport viewport;
     private final Hud hud;
-    private final MapRenderer mapRenderer;
+    private final OrthogonalTiledMapRenderer mapRenderer;
 
     private final World world;
     private final Box2DDebugRenderer debugRenderer;
     private final Mario mario;
+    private final TiledMap map;
 
     public PlayScreen(MarioBrosGame marioBrosGame) {
         this.marioBrosGame = marioBrosGame;
@@ -41,7 +41,7 @@ public class PlayScreen extends ScreenAdapter {
         camera.position.set(viewport.getWorldWidth() / 2, viewport.getWorldHeight() / 2, 0);
 
         hud = new Hud(marioBrosGame.getBatch());
-        TiledMap map = loadMap("level1.tmx");
+        map = loadMap("level1.tmx");
         mapRenderer = new OrthogonalTiledMapRenderer(map, ppm(1));
 
         world = new World(new Vector2(0, -10), true);
@@ -101,5 +101,14 @@ public class PlayScreen extends ScreenAdapter {
     @Override
     public void resize(int width, int height) {
         viewport.update(width, height);
+    }
+
+    @Override
+    public void dispose() {
+        map.dispose();
+        mapRenderer.dispose();
+        world.dispose();
+        debugRenderer.dispose();
+        hud.dispose();
     }
 }
