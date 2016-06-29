@@ -1,36 +1,27 @@
 package com.ilyamur.libgdx.screens;
 
+import static com.ilyamur.libgdx.MarioBrosGame.ppm;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.maps.MapRenderer;
-import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.Body;
-import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
-import com.badlogic.gdx.physics.box2d.FixtureDef;
-import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.ilyamur.libgdx.MarioBrosGame;
+import com.ilyamur.libgdx.Tools.B2WorldCreator;
 import com.ilyamur.libgdx.scenes.Hud;
 import com.ilyamur.libgdx.sprites.Mario;
 
 public class PlayScreen extends ScreenAdapter {
-
-    private static final int GROUND_LAYER = 2;
-    public static final int PIPES_LAYER = 3;
-    public static final int BRICKS_LAYER = 5;
-    public static final int COINS_LAYER = 4;
 
     private final MarioBrosGame marioBrosGame;
     private final OrthographicCamera camera;
@@ -56,42 +47,11 @@ public class PlayScreen extends ScreenAdapter {
         world = new World(new Vector2(0, -10), true);
         debugRenderer = new Box2DDebugRenderer();
 
-        addStaticBodies(map, GROUND_LAYER);
-        addStaticBodies(map, PIPES_LAYER);
-        addStaticBodies(map, BRICKS_LAYER);
-        addStaticBodies(map, COINS_LAYER);
+        (new B2WorldCreator(world, map)).addStaticBodiesAll();
 
         mario = new Mario(this.world);
     }
 
-    private void addStaticBodies(TiledMap map, int groundLayer) {
-        for (RectangleMapObject object : getLayerObjects(map, groundLayer)) {
-            addStaticBody(object);
-        }
-    }
-
-    private void addStaticBody(RectangleMapObject object) {
-        Rectangle rect = object.getRectangle();
-
-        BodyDef bodyDef = new BodyDef();
-        bodyDef.type = BodyDef.BodyType.StaticBody;
-        bodyDef.position.set(ppm(rect.getX() + rect.getWidth() / 2), ppm(rect.getY() + rect.getHeight() / 2));
-        Body body = world.createBody(bodyDef);
-
-        PolygonShape polygonShape = new PolygonShape();
-        polygonShape.setAsBox(ppm(rect.getWidth() / 2), ppm(rect.getHeight() / 2));
-        FixtureDef fixtureDef = new FixtureDef();
-        fixtureDef.shape = polygonShape;
-        body.createFixture(fixtureDef);
-    }
-
-    private Array<RectangleMapObject> getLayerObjects(TiledMap map, int groundLayer) {
-        return map.getLayers().get(groundLayer).getObjects().getByType(RectangleMapObject.class);
-    }
-
-    private float ppm(float value) {
-        return value / MarioBrosGame.PPM;
-    }
 
     private TiledMap loadMap(String fileName) {
         return (new TmxMapLoader()).load(fileName);

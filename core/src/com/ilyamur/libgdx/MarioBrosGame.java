@@ -21,4 +21,8 @@ public class MarioBrosGame extends Game {
     public SpriteBatch getBatch() {
         return batch;
     }
+
+    public static float ppm(float value) {
+        return value / MarioBrosGame.PPM;
+    }
 }
