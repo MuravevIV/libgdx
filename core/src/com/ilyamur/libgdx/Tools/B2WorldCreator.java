@@ -11,6 +11,8 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
+import com.ilyamur.libgdx.sprites.Brick;
+import com.ilyamur.libgdx.sprites.Coin;
 
 public class B2WorldCreator {
 
@@ -20,23 +22,45 @@ public class B2WorldCreator {
     public static final int COINS_LAYER = 4;
 
     private final World world;
-    private final TiledMap tiledMap;
+    private final TiledMap map;
 
-    public B2WorldCreator(World world, TiledMap tiledMap) {
+    public B2WorldCreator(World world, TiledMap map) {
         this.world = world;
-        this.tiledMap = tiledMap;
+        this.map = map;
     }
 
     public void addStaticBodiesAll() {
-        addStaticBodies(GROUND_LAYER);
-        addStaticBodies(PIPES_LAYER);
-        addStaticBodies(BRICKS_LAYER);
-        addStaticBodies(COINS_LAYER);
-    }
+        for (RectangleMapObject mapObject3 : getLayerObjects(map, GROUND_LAYER)) {
+            Rectangle rect3 = mapObject3.getRectangle();
+            BodyDef bodyDef3 = new BodyDef();
+            bodyDef3.type = BodyDef.BodyType.StaticBody;
+            bodyDef3.position.set(ppm(rect3.getX() + rect3.getWidth() / 2), ppm(rect3.getY() + rect3.getHeight() / 2));
+            Body body3 = world.createBody(bodyDef3);
 
-    private void addStaticBodies(int groundLayer) {
-        for (RectangleMapObject mapObject : getLayerObjects(tiledMap, groundLayer)) {
-            addStaticBody(mapObject);
+            PolygonShape polygonShape3 = new PolygonShape();
+            polygonShape3.setAsBox(ppm(rect3.getWidth() / 2), ppm(rect3.getHeight() / 2));
+            FixtureDef fixtureDef3 = new FixtureDef();
+            fixtureDef3.shape = polygonShape3;
+            body3.createFixture(fixtureDef3);
+        }
+        for (RectangleMapObject mapObject2 : getLayerObjects(map, PIPES_LAYER)) {
+            Rectangle rect2 = mapObject2.getRectangle();
+            BodyDef bodyDef2 = new BodyDef();
+            bodyDef2.type = BodyDef.BodyType.StaticBody;
+            bodyDef2.position.set(ppm(rect2.getX() + rect2.getWidth() / 2), ppm(rect2.getY() + rect2.getHeight() / 2));
+            Body body2 = world.createBody(bodyDef2);
+
+            PolygonShape polygonShape2 = new PolygonShape();
+            polygonShape2.setAsBox(ppm(rect2.getWidth() / 2), ppm(rect2.getHeight() / 2));
+            FixtureDef fixtureDef2 = new FixtureDef();
+            fixtureDef2.shape = polygonShape2;
+            body2.createFixture(fixtureDef2);
+        }
+        for (RectangleMapObject mapObject : getLayerObjects(map, BRICKS_LAYER)) {
+            new Brick(world, map, mapObject.getRectangle());
+        }
+        for (RectangleMapObject mapObject : getLayerObjects(map, COINS_LAYER)) {
+            new Coin(world, map, mapObject.getRectangle());
         }
     }
 
@@ -44,18 +68,4 @@ public class B2WorldCreator {
         return map.getLayers().get(groundLayer).getObjects().getByType(RectangleMapObject.class);
     }
 
-    private void addStaticBody(RectangleMapObject mapObject) {
-        Rectangle rect = mapObject.getRectangle();
-
-        BodyDef bodyDef = new BodyDef();
-        bodyDef.type = BodyDef.BodyType.StaticBody;
-        bodyDef.position.set(ppm(rect.getX() + rect.getWidth() / 2), ppm(rect.getY() + rect.getHeight() / 2));
-        Body body = world.createBody(bodyDef);
-
-        PolygonShape polygonShape = new PolygonShape();
-        polygonShape.setAsBox(ppm(rect.getWidth() / 2), ppm(rect.getHeight() / 2));
-        FixtureDef fixtureDef = new FixtureDef();
-        fixtureDef.shape = polygonShape;
-        body.createFixture(fixtureDef);
-    }
 }
